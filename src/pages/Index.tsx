@@ -9,7 +9,6 @@ const Index = () => {
     { name: "זמני תפילות", icon: Clock, href: "#prayers" },
     { name: "שיעורים", icon: BookOpen, href: "#classes" },
     { name: "אירועים", icon: Calendar, href: "#events" },
-    { name: "צור קשר", icon: Mail, href: "#contact" },
     { name: "תרומות", icon: Heart, href: "#donate" },
   ];
 
@@ -86,10 +85,10 @@ const Index = () => {
               זמני תפילות
             </a>
             <a
-              href="#contact"
+              href="#donate"
               className="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary-light transition-colors duration-200"
             >
-              צור קשר
+              תרומות
             </a>
           </div>
         </div>
@@ -172,45 +171,36 @@ const Index = () => {
         </section>
       ))}
 
-      {/* Contact Section */}
-      <section id="contact" className="py-12 px-4">
+      {/* Donations Section */}
+      <section id="donate" className="py-12 px-4 bg-white">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-text text-center mb-8">
-            צור קשר
+            תרומות
           </h2>
-          <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm">
-            <form className="space-y-4">
+          <div className="max-w-2xl mx-auto bg-primary p-8 rounded-lg shadow-sm">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-text mb-2">שם</label>
-                <input
-                  type="text"
-                  id="name"
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
+                <h3 className="text-xl font-bold text-text mb-4">פרטי חשבון להעברה בנקאית</h3>
+                <div className="space-y-2">
+                  <p className="text-text-light">בנק: לאומי</p>
+                  <p className="text-text-light">סניף: 123</p>
+                  <p className="text-text-light">מספר חשבון: 456789</p>
+                  <p className="text-text-light">על שם: עמותת בית הכנסת</p>
+                </div>
               </div>
               <div>
-                <label htmlFor="email" className="block text-text mb-2">אימייל</label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
+                <h3 className="text-xl font-bold text-text mb-4">יצירת קשר לתרומות</h3>
+                <div className="space-y-2">
+                  <p className="text-text-light">טלפון: 03-1234567</p>
+                  <p className="text-text-light">נייד גבאי: 050-1234567</p>
+                </div>
               </div>
-              <div>
-                <label htmlFor="message" className="block text-text mb-2">הודעה</label>
-                <textarea
-                  id="message"
-                  rows={4}
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                ></textarea>
+              <div className="text-center pt-4">
+                <p className="text-text-light">
+                  תרומתכם תסייע בהחזקת בית הכנסת ופעילויותיו. תזכו למצוות!
+                </p>
               </div>
-              <button
-                type="submit"
-                className="w-full bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-light transition-colors duration-200"
-              >
-                שלח
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </section>
