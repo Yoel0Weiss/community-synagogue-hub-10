@@ -12,6 +12,16 @@ const Index = () => {
     { name: "תרומות", icon: Heart, href: "#donate" },
   ];
 
+  /*
+  טמפלייט להוספת אירוע/שיעור/תפילה:
+  {
+    title: "כותרת האירוע/השיעור/התפילה",
+    day: "יום בשבוע",
+    time: "שעה",
+    location: "מיקום",
+  }
+  */
+
   return (
     <div className="min-h-screen bg-primary">
       {/* Navigation */}
@@ -77,99 +87,73 @@ const Index = () => {
           <p className="text-text-light text-lg max-w-2xl mx-auto mb-8">
             מקום של תפילה, לימוד וקהילה
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="#prayers"
-              className="bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-light transition-colors duration-200"
-            >
-              זמני תפילות
-            </a>
-            <a
-              href="#donate"
-              className="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary-light transition-colors duration-200"
-            >
-              תרומות
-            </a>
+        </div>
+      </section>
+
+      {/* Prayer Times Section */}
+      <section id="prayers" className="py-12 px-4 bg-white">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
+            זמני תפילות
+          </h2>
+          <div className="space-y-8">
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">שחרית</h3>
+              <div className="space-y-2">
+                <p className="text-text-light">ימים ב׳-ה׳: 6:50 - בית הכנסת תלפיות</p>
+                <p className="text-text-light">ראש חודש וצומות: 6:40</p>
+                <p className="text-text-light">ימים א׳, ו׳ (אם מתקיים מניין): 7:30</p>
+              </div>
+            </div>
+            
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">מנחה</h3>
+              <div className="space-y-2">
+                <p className="text-text-light">13:15 - בית הכנסת תלפיות</p>
+                <p className="text-text-light">13:20 - בנין קהאלי</p>
+                <p className="text-text-light">13:30 - מעונות ליברמן 4 קומה 1</p>
+                <p className="text-text-light">13:30 - בית הכנסת החדש (רגיל)</p>
+                <p className="text-text-light">13:50 - חדר תפילה ליד האקווריום (קצר)</p>
+                <p className="text-text-light">14:15 - במשק</p>
+                <p className="text-text-light">15:00 - אקדמיה ללשון העברית (קצר)</p>
+                <p className="text-text-light">15:45 - בית הכנסת החדש (רגיל)</p>
+              </div>
+            </div>
+
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">ערבית</h3>
+              <div className="space-y-2">
+                <p className="text-text-light">18:00 - בית הכנסת החדש</p>
+                <p className="text-text-light">20:00 - מול האקווריום (20:15 כשמתאחר צאה״ב) - לפי רישום</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Content Sections */}
-      {[
-        {
-          id: "prayers",
-          title: "זמני תפילות",
-          content: [
-            { day: "שבת", shacharit: "08:30", mincha: "17:30", arvit: "18:30" },
-            { day: "ראשון", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
-            { day: "שני", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
-          ],
-          type: "prayers"
-        },
-        {
-          id: "classes",
-          title: "שיעורים",
-          content: [
-            { title: "שיעור דף יומי", time: "20:00", rabbi: "הרב ישראל כהן" },
-            { title: "הלכה יומית", time: "19:00", rabbi: "הרב דוד לוי" },
-            { title: "פרשת השבוע", time: "21:00", rabbi: "הרב יעקב ישראל" },
-          ],
-          type: "classes"
-        },
-        {
-          id: "events",
-          title: "אירועים",
-          content: [
-            { title: "סעודה שלישית", date: "שבת", time: "17:00" },
-            { title: "שמחת בית השואבה", date: "15/10", time: "20:00" },
-            { title: "שיעור מיוחד", date: "20/10", time: "19:30" },
-          ],
-          type: "events"
-        }
-      ].map((section) => (
-        <section key={section.id} id={section.id} className="py-12 px-4 bg-white">
-          <div className="container mx-auto">
-            <h2 className="text-3xl font-bold text-text text-center mb-8">
-              {section.title}
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {section.content.map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-primary p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                >
-                  {section.type === "prayers" ? (
-                    <>
-                      <h3 className="text-xl font-bold text-text mb-4">{item.day}</h3>
-                      <div className="space-y-2">
-                        <p className="text-text-light">שחרית: {item.shacharit}</p>
-                        <p className="text-text-light">מנחה: {item.mincha}</p>
-                        <p className="text-text-light">ערבית: {item.arvit}</p>
-                      </div>
-                    </>
-                  ) : section.type === "classes" ? (
-                    <>
-                      <h3 className="text-xl font-bold text-text mb-4">{item.title}</h3>
-                      <div className="space-y-2">
-                        <p className="text-text-light">זמן: {item.time}</p>
-                        <p className="text-text-light">מרצה: {item.rabbi}</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-xl font-bold text-text mb-4">{item.title}</h3>
-                      <div className="space-y-2">
-                        <p className="text-text-light">תאריך: {item.date}</p>
-                        <p className="text-text-light">שעה: {item.time}</p>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
+      {/* Classes Section */}
+      <section id="classes" className="py-12 px-4 bg-white">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
+            שיעורים
+          </h2>
+          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
+            <p className="text-text-light text-lg">אין שיעורים קבועים כרגע</p>
           </div>
-        </section>
-      ))}
+        </div>
+      </section>
+
+      {/* Events Section */}
+      <section id="events" className="py-12 px-4 bg-white">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
+            אירועים
+          </h2>
+          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
+            <p className="text-text-light text-lg">אין אירועים מתוכננים כרגע</p>
+          </div>
+        </div>
+      </section>
 
       {/* Donations Section */}
       <section id="donate" className="py-12 px-4 bg-white">
