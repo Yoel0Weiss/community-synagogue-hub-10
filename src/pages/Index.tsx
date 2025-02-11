@@ -95,69 +95,123 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Prayer Times Section */}
-      <section id="prayers" className="py-12 px-4 bg-white">
+      {/* Content Sections */}
+      {[
+        {
+          id: "prayers",
+          title: "זמני תפילות",
+          content: [
+            { day: "שבת", shacharit: "08:30", mincha: "17:30", arvit: "18:30" },
+            { day: "ראשון", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
+            { day: "שני", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
+          ],
+          type: "prayers"
+        },
+        {
+          id: "classes",
+          title: "שיעורים",
+          content: [
+            { title: "שיעור דף יומי", time: "20:00", rabbi: "הרב ישראל כהן" },
+            { title: "הלכה יומית", time: "19:00", rabbi: "הרב דוד לוי" },
+            { title: "פרשת השבוע", time: "21:00", rabbi: "הרב יעקב ישראל" },
+          ],
+          type: "classes"
+        },
+        {
+          id: "events",
+          title: "אירועים",
+          content: [
+            { title: "סעודה שלישית", date: "שבת", time: "17:00" },
+            { title: "שמחת בית השואבה", date: "15/10", time: "20:00" },
+            { title: "שיעור מיוחד", date: "20/10", time: "19:30" },
+          ],
+          type: "events"
+        }
+      ].map((section) => (
+        <section key={section.id} id={section.id} className="py-12 px-4 bg-white">
+          <div className="container mx-auto">
+            <h2 className="text-3xl font-bold text-text text-center mb-8">
+              {section.title}
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {section.content.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-primary p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                >
+                  {section.type === "prayers" ? (
+                    <>
+                      <h3 className="text-xl font-bold text-text mb-4">{item.day}</h3>
+                      <div className="space-y-2">
+                        <p className="text-text-light">שחרית: {item.shacharit}</p>
+                        <p className="text-text-light">מנחה: {item.mincha}</p>
+                        <p className="text-text-light">ערבית: {item.arvit}</p>
+                      </div>
+                    </>
+                  ) : section.type === "classes" ? (
+                    <>
+                      <h3 className="text-xl font-bold text-text mb-4">{item.title}</h3>
+                      <div className="space-y-2">
+                        <p className="text-text-light">זמן: {item.time}</p>
+                        <p className="text-text-light">מרצה: {item.rabbi}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-xl font-bold text-text mb-4">{item.title}</h3>
+                      <div className="space-y-2">
+                        <p className="text-text-light">תאריך: {item.date}</p>
+                        <p className="text-text-light">שעה: {item.time}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* Contact Section */}
+      <section id="contact" className="py-12 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-text text-center mb-8">
-            זמני תפילות
+            צור קשר
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { day: "שבת", shacharit: "08:30", mincha: "17:30", arvit: "18:30" },
-              { day: "ראשון", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
-              { day: "שני", shacharit: "06:30", mincha: "17:30", arvit: "18:30" },
-            ].map((time) => (
-              <div
-                key={time.day}
-                className="bg-primary p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+          <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm">
+            <form className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-text mb-2">שם</label>
+                <input
+                  type="text"
+                  id="name"
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-text mb-2">אימייל</label>
+                <input
+                  type="email"
+                  id="email"
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-text mb-2">הודעה</label>
+                <textarea
+                  id="message"
+                  rows={4}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent-light transition-colors duration-200"
               >
-                <h3 className="text-xl font-bold text-text mb-4">{time.day}</h3>
-                <div className="space-y-2">
-                  <p className="text-text-light">שחרית: {time.shacharit}</p>
-                  <p className="text-text-light">מנחה: {time.mincha}</p>
-                  <p className="text-text-light">ערבית: {time.arvit}</p>
-                </div>
-              </div>
-            ))}
+                שלח
+              </button>
+            </form>
           </div>
-        </div>
-      </section>
-
-      {/* Quick Links */}
-      <section className="py-12 px-4">
-        <div className="container mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            {
-              title: "שיעורים",
-              description: "הצטרפו לשיעורי התורה השבועיים שלנו",
-              icon: BookOpen,
-              href: "#classes",
-            },
-            {
-              title: "אירועים",
-              description: "לוח אירועים ופעילויות קהילתיות",
-              icon: Calendar,
-              href: "#events",
-            },
-            {
-              title: "צור קשר",
-              description: "נשמח לעמוד לרשותכם בכל שאלה",
-              icon: Mail,
-              href: "#contact",
-            },
-          ].map((item) => (
-            <a
-              key={item.title}
-              href={item.href}
-              className="group bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <item.icon className="w-6 h-6 text-accent" />
-                <h3 className="text-xl font-bold text-text">{item.title}</h3>
-              </div>
-              <p className="text-text-light">{item.description}</p>
-            </a>
-          ))}
         </div>
       </section>
     </div>
