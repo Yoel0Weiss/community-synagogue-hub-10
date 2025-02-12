@@ -21,20 +21,20 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#F5F0E6", // בז' בהיר
-          dark: "#E5D5C5",    // בז' כהה יותר
+          DEFAULT: "#008080", // טורקיז כהה
+          dark: "#006666",    // טורקיז כהה יותר
         },
         secondary: {
-          DEFAULT: "#C4A484", // חום בהיר
-          light: "#D4B494",   // חום בהיר יותר
+          DEFAULT: "#ea384c", // אדום של האוניברסיטה העברית
+          light: "#ff4d4d",   // אדום בהיר יותר
         },
         accent: {
-          DEFAULT: "#DAA520", // זהב
-          light: "#F4C430",   // זהב בהיר
+          DEFAULT: "#FFFFFF", // לבן
+          light: "#F5F5F5",   // לבן-אפור בהיר
         },
         text: {
-          DEFAULT: "#2D3142", // כחול כהה
-          light: "#4F5366",   // כחול בהיר יותר
+          DEFAULT: "#333333", // אפור כהה
+          light: "#666666",   // אפור בהיר
         },
       },
       keyframes: {
