@@ -97,7 +97,7 @@ const Index = () => {
             זמני תפילות
           </h2>
           <div className="space-y-8">
-            <div className="bg-primary p-6 rounded-lg shadow-sm">
+            <div className="bg-primary p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
               <h3 className="text-xl font-bold text-text mb-4">שחרית</h3>
               <div className="space-y-2">
                 <p className="text-text-light">ימים ב׳-ה׳: 6:50 - בית הכנסת תלפיות</p>
@@ -106,7 +106,7 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="bg-primary p-6 rounded-lg shadow-sm">
+            <div className="bg-primary p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
               <h3 className="text-xl font-bold text-text mb-4">מנחה</h3>
               <div className="space-y-2">
                 <p className="text-text-light">13:15 - בית הכנסת תלפיות</p>
@@ -120,7 +120,7 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="bg-primary p-6 rounded-lg shadow-sm">
+            <div className="bg-primary p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
               <h3 className="text-xl font-bold text-text mb-4">ערבית</h3>
               <div className="space-y-2">
                 <p className="text-text-light">18:00 - בית הכנסת החדש</p>
@@ -132,12 +132,12 @@ const Index = () => {
       </section>
 
       {/* Classes Section */}
-      <section id="classes" className="py-12 px-4 bg-white">
+      <section id="classes" className="py-12 px-4 bg-secondary/5">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-text text-center mb-8">
             שיעורים
           </h2>
-          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
+          <div className="bg-primary p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] text-center">
             <p className="text-text-light text-lg">אין שיעורים קבועים כרגע</p>
           </div>
         </div>
@@ -149,19 +149,19 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-text text-center mb-8">
             אירועים
           </h2>
-          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
+          <div className="bg-primary p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] text-center">
             <p className="text-text-light text-lg">אין אירועים מתוכננים כרגע</p>
           </div>
         </div>
       </section>
 
       {/* Donations Section */}
-      <section id="donate" className="py-12 px-4 bg-white">
+      <section id="donate" className="py-12 px-4 bg-secondary/5">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-text text-center mb-8">
             תרומות
           </h2>
-          <div className="max-w-2xl mx-auto bg-primary p-8 rounded-lg shadow-sm">
+          <div className="max-w-2xl mx-auto bg-primary p-8 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-bold text-text mb-4">פרטי חשבון להעברה בנקאית</h3>

@@ -21,20 +21,20 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#F5F0E6",
-          dark: "#E5D5C5",
+          DEFAULT: "#F5F0E6", // בז' בהיר
+          dark: "#E5D5C5",    // בז' כהה יותר
         },
         secondary: {
-          DEFAULT: "#C4A484",
-          light: "#D4B494",
+          DEFAULT: "#C4A484", // חום בהיר
+          light: "#D4B494",   // חום בהיר יותר
         },
         accent: {
-          DEFAULT: "#DAA520",
-          light: "#F4C430",
+          DEFAULT: "#DAA520", // זהב
+          light: "#F4C430",   // זהב בהיר
         },
         text: {
-          DEFAULT: "#2D3142",
-          light: "#4F5366",
+          DEFAULT: "#2D3142", // כחול כהה
+          light: "#4F5366",   // כחול בהיר יותר
         },
       },
       keyframes: {
