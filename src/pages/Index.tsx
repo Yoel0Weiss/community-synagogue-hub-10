@@ -1,5 +1,5 @@
 
-import { Calendar, Clock, BookOpen, Heart } from "lucide-react";
+import { Calendar, Clock, BookOpen, Mail, Heart } from "lucide-react";
 import { useState } from "react";
 
 const Index = () => {
@@ -23,13 +23,13 @@ const Index = () => {
   */
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-primary">
       {/* Navigation */}
-      <nav className="fixed w-full bg-white shadow-md z-50">
+      <nav className="fixed w-full bg-white/80 backdrop-blur-md z-50 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-secondary">בית הכנסת</h1>
+              <h1 className="text-2xl font-bold text-text">בית הכנסת</h1>
             </div>
 
             {/* Desktop Menu */}
@@ -38,39 +38,38 @@ const Index = () => {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="flex items-center gap-2 text-text hover:text-secondary transition-colors duration-300 font-medium"
+                  className="flex items-center gap-2 text-text hover:text-accent transition-colors duration-200"
                 >
                   <span>{item.name}</span>
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 text-secondary"
+              className="md:hidden p-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="תפריט"
             >
-              <div className="w-6 h-0.5 bg-current mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-current mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-current"></div>
+              <div className="w-6 h-0.5 bg-text mb-1.5"></div>
+              <div className="w-6 h-0.5 bg-text mb-1.5"></div>
+              <div className="w-6 h-0.5 bg-text"></div>
             </button>
           </div>
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden absolute top-20 left-0 w-full bg-white shadow-lg animate-fade-in">
+            <div className="md:hidden absolute top-16 left-0 w-full bg-white/95 backdrop-blur-md shadow-lg animate-fade-in">
               <div className="px-4 py-2 space-y-2">
                 {menuItems.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="flex items-center gap-2 py-3 text-text hover:text-secondary transition-colors duration-300"
+                    className="flex items-center gap-2 py-2 text-text hover:text-accent transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.name}</span>
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.name}</span>
                   </a>
                 ))}
               </div>
@@ -80,36 +79,36 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 bg-secondary text-white">
+      <section className="pt-24 pb-12 px-4">
         <div className="container mx-auto text-center animate-fade-up">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-text mb-6">
             ברוכים הבאים לבית הכנסת שלנו
           </h1>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto mb-8 readable-text">
+          <p className="text-text-light text-lg max-w-2xl mx-auto mb-8">
             מקום של תפילה, לימוד וקהילה
           </p>
         </div>
       </section>
 
       {/* Prayer Times Section */}
-      <section id="prayers" className="py-16 px-4 bg-background">
+      <section id="prayers" className="py-12 px-4 bg-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-secondary text-center mb-12">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
             זמני תפילות
           </h2>
-          <div className="space-y-8 max-w-4xl mx-auto">
-            <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="text-2xl font-bold text-secondary mb-6">שחרית</h3>
-              <div className="space-y-3">
+          <div className="space-y-8">
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">שחרית</h3>
+              <div className="space-y-2">
                 <p className="text-text-light">ימים ב׳-ה׳: 6:50 - בית הכנסת תלפיות</p>
                 <p className="text-text-light">ראש חודש וצומות: 6:40</p>
                 <p className="text-text-light">ימים א׳, ו׳ (אם מתקיים מניין): 7:30</p>
               </div>
             </div>
             
-            <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="text-2xl font-bold text-secondary mb-6">מנחה</h3>
-              <div className="space-y-3">
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">מנחה</h3>
+              <div className="space-y-2">
                 <p className="text-text-light">13:15 - בית הכנסת תלפיות</p>
                 <p className="text-text-light">13:20 - בנין קהאלי</p>
                 <p className="text-text-light">13:30 - מעונות ליברמן 4 קומה 1</p>
@@ -121,9 +120,9 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="text-2xl font-bold text-secondary mb-6">ערבית</h3>
-              <div className="space-y-3">
+            <div className="bg-primary p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-bold text-text mb-4">ערבית</h3>
+              <div className="space-y-2">
                 <p className="text-text-light">18:00 - בית הכנסת החדש</p>
                 <p className="text-text-light">20:00 - מול האקווריום (20:15 כשמתאחר צאה״ב) - לפי רישום</p>
               </div>
@@ -133,40 +132,40 @@ const Index = () => {
       </section>
 
       {/* Classes Section */}
-      <section id="classes" className="py-16 px-4 bg-background-dark">
+      <section id="classes" className="py-12 px-4 bg-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-secondary text-center mb-12">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
             שיעורים
           </h2>
-          <div className="bg-white p-8 rounded-lg shadow-sm max-w-2xl mx-auto text-center">
+          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
             <p className="text-text-light text-lg">אין שיעורים קבועים כרגע</p>
           </div>
         </div>
       </section>
 
       {/* Events Section */}
-      <section id="events" className="py-16 px-4 bg-background">
+      <section id="events" className="py-12 px-4 bg-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-secondary text-center mb-12">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
             אירועים
           </h2>
-          <div className="bg-white p-8 rounded-lg shadow-sm max-w-2xl mx-auto text-center">
+          <div className="bg-primary p-6 rounded-lg shadow-sm text-center">
             <p className="text-text-light text-lg">אין אירועים מתוכננים כרגע</p>
           </div>
         </div>
       </section>
 
       {/* Donations Section */}
-      <section id="donate" className="py-16 px-4 bg-background-dark">
+      <section id="donate" className="py-12 px-4 bg-white">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-secondary text-center mb-12">
+          <h2 className="text-3xl font-bold text-text text-center mb-8">
             תרומות
           </h2>
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
-            <div className="space-y-8">
+          <div className="max-w-2xl mx-auto bg-primary p-8 rounded-lg shadow-sm">
+            <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-secondary mb-6">פרטי חשבון להעברה בנקאית</h3>
-                <div className="space-y-3">
+                <h3 className="text-xl font-bold text-text mb-4">פרטי חשבון להעברה בנקאית</h3>
+                <div className="space-y-2">
                   <p className="text-text-light">בנק: לאומי</p>
                   <p className="text-text-light">סניף: 123</p>
                   <p className="text-text-light">מספר חשבון: 456789</p>
@@ -174,14 +173,14 @@ const Index = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-secondary mb-6">יצירת קשר לתרומות</h3>
-                <div className="space-y-3">
+                <h3 className="text-xl font-bold text-text mb-4">יצירת קשר לתרומות</h3>
+                <div className="space-y-2">
                   <p className="text-text-light">טלפון: 03-1234567</p>
                   <p className="text-text-light">נייד גבאי: 050-1234567</p>
                 </div>
               </div>
               <div className="text-center pt-4">
-                <p className="text-text-light italic">
+                <p className="text-text-light">
                   תרומתכם תסייע בהחזקת בית הכנסת ופעילויותיו. תזכו למצוות!
                 </p>
               </div>

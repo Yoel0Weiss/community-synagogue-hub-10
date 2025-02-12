@@ -21,31 +21,27 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#F5F5F5",
-          dark: "#E5E5E5",
+          DEFAULT: "#F5F0E6",
+          dark: "#E5D5C5",
         },
         secondary: {
-          DEFAULT: "#002E5F", // כחול כהה של האוניברסיטה העברית
-          light: "#0047B3",
+          DEFAULT: "#C4A484",
+          light: "#D4B494",
         },
         accent: {
-          DEFAULT: "#9B0000", // אדום של האוניברסיטה העברית
-          light: "#CC0000",
+          DEFAULT: "#DAA520",
+          light: "#F4C430",
         },
         text: {
-          DEFAULT: "#1A1A1A",
-          light: "#4A4A4A",
+          DEFAULT: "#2D3142",
+          light: "#4F5366",
         },
-        background: {
-          DEFAULT: "#FFFFFF",
-          dark: "#F8F8F8",
-        }
       },
       keyframes: {
         "fade-up": {
           "0%": {
             opacity: "0",
-            transform: "translateY(20px)",
+            transform: "translateY(10px)",
           },
           "100%": {
             opacity: "1",
@@ -58,8 +54,8 @@ export default {
         },
       },
       animation: {
-        "fade-up": "fade-up 0.7s ease-out",
-        "fade-in": "fade-in 0.5s ease-out",
+        "fade-up": "fade-up 0.5s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
       },
     },
   },
