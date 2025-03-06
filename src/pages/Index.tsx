@@ -1,4 +1,3 @@
-
 import { Calendar, Clock, BookOpen, Mail, Heart, Facebook, Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
@@ -12,9 +11,6 @@ const Index = () => {
     { name: "שיעורים", icon: BookOpen, href: "#classes" },
     { name: "אירועים", icon: Calendar, href: "#events" },
     { name: "תרומות", icon: Heart, href: "#donate" },
-    { name: "פייסבוק", icon: Facebook, href: "https://facebook.com", isExternal: true },
-    { name: "אינסטגרם", icon: Instagram, href: "https://instagram.com", isExternal: true },
-    { name: "יוטיוב", icon: Youtube, href: "https://youtube.com", isExternal: true },
   ];
 
   /*
