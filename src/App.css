@@ -1,42 +1,78 @@
+
+/* Reset some browser defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base styles for the app */
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid #008080;
+  outline-offset: 2px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Make images responsive */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Skip to content link for accessibility */
+.skip-to-content {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #008080;
+  color: white;
+  padding: 0.5rem 1rem;
+  z-index: 100;
+  text-decoration: none;
+  border-radius: 0 0 0.25rem 0.25rem;
+  transition: top 0.3s;
+  top: -40px;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Print styles */
+@media print {
+  nav, footer, .no-print {
+    display: none !important;
   }
-  to {
-    transform: rotate(360deg);
+  
+  body {
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  a {
+    color: #000;
+    text-decoration: none;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+  
+  img {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+  }
+  
+  @page {
+    margin: 2cm;
+  }
 }
