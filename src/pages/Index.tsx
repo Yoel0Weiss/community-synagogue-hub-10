@@ -1,6 +1,8 @@
 
-import { Calendar, Clock, BookOpen, Mail, Heart } from "lucide-react";
+import { Calendar, Clock, BookOpen, Mail, Heart, Facebook, Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +12,9 @@ const Index = () => {
     { name: "שיעורים", icon: BookOpen, href: "#classes" },
     { name: "אירועים", icon: Calendar, href: "#events" },
     { name: "תרומות", icon: Heart, href: "#donate" },
+    { name: "פייסבוק", icon: Facebook, href: "https://facebook.com", isExternal: true },
+    { name: "אינסטגרם", icon: Instagram, href: "https://instagram.com", isExternal: true },
+    { name: "יוטיוב", icon: Youtube, href: "https://youtube.com", isExternal: true },
   ];
 
   /*
@@ -38,6 +43,8 @@ const Index = () => {
                 <a
                   key={item.name}
                   href={item.href}
+                  target={item.isExternal ? "_blank" : undefined}
+                  rel={item.isExternal ? "noopener noreferrer" : undefined}
                   className="flex items-center gap-2 text-accent hover:text-accent-light transition-colors duration-200"
                 >
                   <span>{item.name}</span>
@@ -65,6 +72,8 @@ const Index = () => {
                   <a
                     key={item.name}
                     href={item.href}
+                    target={item.isExternal ? "_blank" : undefined}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}
                     className="flex items-center gap-2 py-2 text-accent hover:text-accent-light transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -96,37 +105,82 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-text text-center mb-8">
             זמני תפילות
           </h2>
-          <div className="space-y-8">
-            <div className="bg-accent-light p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
-              <h3 className="text-xl font-bold text-text mb-4">שחרית</h3>
-              <div className="space-y-2">
-                <p className="text-text-light">ימים ב׳-ה׳: 6:50 - בית הכנסת תלפיות</p>
-                <p className="text-text-light">ראש חודש וצומות: 6:40</p>
-                <p className="text-text-light">ימים א׳, ו׳ (אם מתקיים מניין): 7:30</p>
-              </div>
-            </div>
-            
-            <div className="bg-accent-light p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
-              <h3 className="text-xl font-bold text-text mb-4">מנחה</h3>
-              <div className="space-y-2">
-                <p className="text-text-light">13:15 - בית הכנסת תלפיות</p>
-                <p className="text-text-light">13:20 - בנין קהאלי</p>
-                <p className="text-text-light">13:30 - מעונות ליברמן 4 קומה 1</p>
-                <p className="text-text-light">13:30 - בית הכנסת החדש (רגיל)</p>
-                <p className="text-text-light">13:50 - חדר תפילה ליד האקווריום (קצר)</p>
-                <p className="text-text-light">14:15 - במשק</p>
-                <p className="text-text-light">15:00 - אקדמיה ללשון העברית (קצר)</p>
-                <p className="text-text-light">15:45 - בית הכנסת החדש (רגיל)</p>
-              </div>
-            </div>
 
-            <div className="bg-accent-light p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
-              <h3 className="text-xl font-bold text-text mb-4">ערבית</h3>
-              <div className="space-y-2">
-                <p className="text-text-light">18:00 - בית הכנסת החדש</p>
-                <p className="text-text-light">20:00 - מול האקווריום (20:15 כשמתאחר צאה״ב) - לפי רישום</p>
+          {/* בית הכנסת החדש */}
+          <div className="bg-accent-light p-6 rounded-lg shadow-sm mb-8 border-r-4 border-primary">
+            <h3 className="text-2xl font-bold text-primary mb-4 flex items-center">
+              <Clock className="w-5 h-5 ml-2" />
+              בית הכנסת החדש
+            </h3>
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-xl font-bold text-text mb-2">שחרית</h4>
+                <div className="space-y-2 mr-4">
+                  <p className="text-text-light">כרגע אין מניין קבוע</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-xl font-bold text-text mb-2">מנחה</h4>
+                <div className="space-y-2 mr-4">
+                  <p className="text-text-light">13:30 - (רגיל)</p>
+                  <p className="text-text-light">15:45 - (רגיל)</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xl font-bold text-text mb-2">ערבית</h4>
+                <div className="space-y-2 mr-4">
+                  <p className="text-text-light">18:00</p>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* מקומות אחרים */}
+          <div className="bg-accent-light p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01]">
+            <h3 className="text-2xl font-bold text-secondary mb-4 flex items-center">
+              <Clock className="w-5 h-5 ml-2" />
+              מקומות אחרים
+            </h3>
+            
+            <Collapsible className="space-y-6">
+              <div>
+                <h4 className="text-xl font-bold text-text mb-2">שחרית</h4>
+                <div className="space-y-2 mr-4">
+                  <p className="text-text-light">ימים ב׳-ה׳: 6:50 - בית הכנסת תלפיות</p>
+                  <p className="text-text-light">ראש חודש וצומות: 6:40</p>
+                  <p className="text-text-light">ימים א׳, ו׳ (אם מתקיים מניין): 7:30</p>
+                </div>
+              </div>
+              
+              <CollapsibleTrigger className="w-full text-right text-primary hover:text-primary-dark transition-colors">
+                <span className="flex items-center justify-end mt-2">
+                  <span className="ml-1">הראה את כל זמני המנחה</span>
+                </span>
+              </CollapsibleTrigger>
+              
+              <CollapsibleContent>
+                <div>
+                  <h4 className="text-xl font-bold text-text mb-2">מנחה</h4>
+                  <div className="space-y-2 mr-4">
+                    <p className="text-text-light">13:15 - בית הכנסת תלפיות</p>
+                    <p className="text-text-light">13:20 - בנין קהאלי</p>
+                    <p className="text-text-light">13:30 - מעונות ליברמן 4 קומה 1</p>
+                    <p className="text-text-light">13:50 - חדר תפילה ליד האקווריום (קצר)</p>
+                    <p className="text-text-light">14:15 - במשק</p>
+                    <p className="text-text-light">15:00 - אקדמיה ללשון העברית (קצר)</p>
+                  </div>
+                </div>
+              </CollapsibleContent>
+
+              <div>
+                <h4 className="text-xl font-bold text-text mb-2">ערבית</h4>
+                <div className="space-y-2 mr-4">
+                  <p className="text-text-light">20:00 - מול האקווריום (20:15 כשמתאחר צאה״ב) - לפי רישום</p>
+                </div>
+              </div>
+            </Collapsible>
           </div>
         </div>
       </section>
