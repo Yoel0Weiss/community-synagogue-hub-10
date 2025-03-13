@@ -26,25 +26,6 @@ img {
   display: block;
 }
 
-/* Skip to content link for accessibility */
-.skip-to-content {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #008080;
-  color: white;
-  padding: 0.5rem 1rem;
-  z-index: 100;
-  text-decoration: none;
-  border-radius: 0 0 0.25rem 0.25rem;
-  transition: top 0.3s;
-  top: -40px;
-}
-
-.skip-to-content:focus {
-  top: 0;
-}
-
 /* Print styles */
 @media print {
   nav, footer, .no-print {
