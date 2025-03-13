@@ -7,15 +7,11 @@ import {
   Heart, 
   Menu, 
   X, 
-  ChevronDown, 
-  Search, 
   MapPin,
-  PhoneCall,
-  Mail
+  PhoneCall
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -23,54 +19,41 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 const Index = () => {
   // State for UI elements
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeSection, setActiveSection] = useState("prayers");
-  const [animatedElements, setAnimatedElements] = useState<HTMLElement[]>([]);
 
-  // Menu items for navigation
+  // Menu items for navigation (removed contact)
   const menuItems = [
     { name: "זמני תפילות", icon: Clock, href: "#prayers" },
     { name: "שיעורים", icon: BookOpen, href: "#classes" },
     { name: "אירועים", icon: Calendar, href: "#events" },
     { name: "תרומות", icon: Heart, href: "#donate" },
-    { name: "צור קשר", icon: Mail, href: "#contact" },
   ];
 
-  // Scroll animation effect
+  // Fix for scroll animation - using simpler approach without opacity change
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in");
-            entry.target.classList.add("opacity-100");
+            entry.target.classList.add("visible");
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "0px 0px -100px 0px" }
     );
 
     const elements = document.querySelectorAll(".animate-on-scroll");
-    elements.forEach((el) => {
-      observer.observe(el);
-      setAnimatedElements((prev) => [...prev, el as HTMLElement]);
-    });
+    elements.forEach((el) => observer.observe(el));
 
     return () => {
-      animatedElements.forEach((el) => observer.unobserve(el));
+      elements.forEach((el) => observer.unobserve(el));
     };
   }, []);
-
-  // Search functionality
-  const filterContent = (content: string) => {
-    if (!searchTerm) return true;
-    return content.toLowerCase().includes(searchTerm.toLowerCase());
-  };
 
   // Handle section active state on scroll
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["prayers", "classes", "events", "donate", "contact"];
+      const sections = ["prayers", "classes", "events", "donate"];
       
       // Find which section is currently in view
       for (const section of sections) {
@@ -99,19 +82,7 @@ const Index = () => {
               <h1 className="text-2xl md:text-3xl font-bold">בית הכנסת</h1>
             </div>
 
-            {/* Search Bar */}
-            <div className="hidden md:flex items-center max-w-xs w-full relative mx-4">
-              <Input
-                type="text"
-                placeholder="חיפוש..."
-                className="w-full pr-10 border-none bg-primary-light text-accent focus:ring-2 focus:ring-accent"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="w-5 h-5 absolute left-3 text-accent-light" />
-            </div>
-
-            {/* Desktop Menu */}
+            {/* Desktop Menu - removed search bar */}
             <div className="hidden md:flex items-center space-x-1 flex-row-reverse">
               {menuItems.map((item) => (
                 <a
@@ -144,22 +115,10 @@ const Index = () => {
             </button>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - removed search functionality */}
           {isMenuOpen && (
             <div className="md:hidden absolute top-20 left-0 w-full bg-primary shadow-lg animate-slide-in">
               <div className="px-4 py-4 space-y-4">
-                {/* Mobile Search */}
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="חיפוש..."
-                    className="w-full pr-10 bg-primary-light text-accent border-none"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-accent-light" />
-                </div>
-
                 {menuItems.map((item) => (
                   <a
                     key={item.name}
@@ -198,7 +157,7 @@ const Index = () => {
               <a href="#prayers">זמני תפילה</a>
             </Button>
             <Button asChild variant="outline" size="lg" className="text-lg bg-transparent border-accent text-accent hover:bg-primary-light">
-              <a href="#contact">צור קשר</a>
+              <a href="#donate">תרומות</a>
             </Button>
           </div>
         </div>
@@ -207,7 +166,7 @@ const Index = () => {
       {/* Prayer Times Section */}
       <section id="prayers" className="py-20 px-4 bg-accent">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-on-scroll opacity-0">
+          <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4 inline-block border-b-4 border-primary pb-2">
               זמני תפילות
             </h2>
@@ -218,7 +177,7 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* בית הכנסת החדש */}
-            <Card className="animate-on-scroll opacity-0 shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-primary">
+            <Card className="animate-on-scroll shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-primary">
               <CardHeader className="bg-gradient-to-r from-primary to-primary-light text-accent">
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
@@ -259,7 +218,7 @@ const Index = () => {
             </Card>
 
             {/* מקומות אחרים */}
-            <Card className="animate-on-scroll opacity-0 shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-secondary">
+            <Card className="animate-on-scroll shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-secondary">
               <CardHeader className="bg-gradient-to-r from-secondary to-secondary-light text-accent">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
@@ -351,7 +310,7 @@ const Index = () => {
       {/* Classes Section */}
       <section id="classes" className="py-20 px-4 bg-accent-dark">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-on-scroll opacity-0">
+          <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4 inline-block border-b-4 border-primary pb-2">
               שיעורים
             </h2>
@@ -360,7 +319,7 @@ const Index = () => {
             </p>
           </div>
 
-          <Card className="max-w-3xl mx-auto animate-on-scroll opacity-0 shadow-raised">
+          <Card className="max-w-3xl mx-auto animate-on-scroll shadow-raised">
             <div className="p-6 text-center">
               <div className="bg-accent p-10 rounded-xl shadow-inner">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 text-primary" />
@@ -375,7 +334,7 @@ const Index = () => {
       {/* Events Section */}
       <section id="events" className="py-20 px-4 bg-accent">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-on-scroll opacity-0">
+          <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-3xl md:text-4xl font-bold text-text mb-4 inline-block border-b-4 border-primary pb-2">
               אירועים
             </h2>
@@ -384,7 +343,7 @@ const Index = () => {
             </p>
           </div>
 
-          <Card className="max-w-3xl mx-auto animate-on-scroll opacity-0 shadow-raised">
+          <Card className="max-w-3xl mx-auto animate-on-scroll shadow-raised">
             <div className="p-6 text-center">
               <div className="bg-accent-dark p-10 rounded-xl shadow-inner">
                 <Calendar className="w-16 h-16 mx-auto mb-4 text-primary" />
@@ -399,7 +358,7 @@ const Index = () => {
       {/* Donations Section */}
       <section id="donate" className="py-20 px-4 bg-gradient-to-b from-secondary to-secondary-dark text-accent">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-on-scroll opacity-0">
+          <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 inline-block border-b-4 border-accent pb-2">
               תרומות
             </h2>
@@ -408,7 +367,7 @@ const Index = () => {
             </p>
           </div>
 
-          <Card className="max-w-3xl mx-auto bg-white animate-on-scroll opacity-0 shadow-raised">
+          <Card className="max-w-3xl mx-auto bg-white animate-on-scroll shadow-raised">
             <CardContent className="p-8">
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-6">
@@ -450,94 +409,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-4 bg-accent">
-        <div className="container mx-auto">
-          <div className="text-center mb-16 animate-on-scroll opacity-0">
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4 inline-block border-b-4 border-primary pb-2">
-              צור קשר
-            </h2>
-            <p className="text-lg text-text-light max-w-2xl mx-auto">
-              נשמח לעמוד לרשותכם בכל שאלה או בקשה
-            </p>
-          </div>
-
-          <Card className="max-w-3xl mx-auto animate-on-scroll opacity-0 shadow-raised">
-            <CardContent className="p-8">
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-xl font-bold text-text mb-6">פרטי התקשרות</h3>
-                  <div className="space-y-6">
-                    <div className="flex items-start">
-                      <MapPin className="w-5 h-5 mr-3 text-primary mt-1" />
-                      <div>
-                        <h4 className="font-medium">כתובת</h4>
-                        <p className="text-text-light">רחוב האוניברסיטה 1, ירושלים</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Mail className="w-5 h-5 mr-3 text-primary mt-1" />
-                      <div>
-                        <h4 className="font-medium">דוא"ל</h4>
-                        <p className="text-text-light">contact@synagogue.org.il</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <PhoneCall className="w-5 h-5 mr-3 text-primary mt-1" />
-                      <div>
-                        <h4 className="font-medium">טלפון</h4>
-                        <p className="text-text-light">02-1234567</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-bold text-text mb-6">שלח הודעה</h3>
-                  <form className="space-y-4">
-                    <div>
-                      <Input 
-                        placeholder="שם מלא" 
-                        className="w-full" 
-                        aria-label="שם מלא"
-                      />
-                    </div>
-                    <div>
-                      <Input 
-                        type="email" 
-                        placeholder="דוא״ל" 
-                        className="w-full" 
-                        aria-label="דוא״ל"
-                      />
-                    </div>
-                    <div>
-                      <Input 
-                        type="tel" 
-                        placeholder="טלפון" 
-                        className="w-full" 
-                        aria-label="טלפון"
-                      />
-                    </div>
-                    <div>
-                      <textarea 
-                        placeholder="הודעה" 
-                        className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
-                        aria-label="הודעה"
-                      />
-                    </div>
-                    <Button className="w-full">שלח הודעה</Button>
-                  </form>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-primary text-accent py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div>
               <h3 className="text-xl font-bold mb-4">בית הכנסת</h3>
               <p className="mb-4 text-accent-light">מקום של תפילה, לימוד וקהילה</p>
@@ -556,15 +431,6 @@ const Index = () => {
                   </li>
                 ))}
               </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-bold mb-4">שעות פעילות</h3>
-              <div className="space-y-2 text-accent-light">
-                <p>יום ראשון - חמישי: 07:00 - 22:00</p>
-                <p>יום שישי: 07:00 - כניסת שבת</p>
-                <p>שבת: לפי זמני התפילות</p>
-              </div>
             </div>
           </div>
           

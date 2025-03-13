@@ -41,9 +41,9 @@ p {
   }
 }
 
-/* Animation on scroll */
+/* Animation on scroll - FIXED to prevent disappearing content */
 .animate-on-scroll {
-  opacity: 0;
+  opacity: 0.1; /* Start with slight visibility instead of completely hidden */
   transform: translateY(20px);
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
