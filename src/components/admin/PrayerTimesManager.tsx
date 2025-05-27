@@ -1,35 +1,32 @@
-
-import { useState, useEffect } from "react";
+// src/components/admin/PrayerTimesManager.tsx
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash, Edit, Plus, Check, X } from "lucide-react";
+import { Trash, Edit, Plus, Check, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-
-interface PrayerTime {
-  id: string;
-  location: string;
-  type: string;
-  day: string;
-  time: string;
-}
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  getPrayerTimes,
+  addPrayerTime,
+  updatePrayerTime,
+  deletePrayerTime,
+  PrayerTime, // Use the interface from the API file
+  PrayerTimeData // Use the interface for adding/editing data
+} from "@/lib/prayerTimeApi"; // Import from the new API file
 
 const PrayerTimesManager = () => {
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([
-    { id: "1", location: "בית הכנסת החדש", type: "שחרית", day: "רגיל", time: "אין מניין קבוע" },
-    { id: "2", location: "בית הכנסת החדש", type: "מנחה", day: "רגיל", time: "13:30" },
-    { id: "3", location: "בית הכנסת החדש", type: "מנחה", day: "רגיל", time: "15:45" },
-    { id: "4", location: "בית הכנסת החדש", type: "ערבית", day: "רגיל", time: "18:00" },
-    { id: "5", location: "מקומות אחרים", type: "שחרית", day: "ימים ב׳-ה׳", time: "6:50 - בית הכנסת תלפיות" },
-    { id: "6", location: "מקומות אחרים", type: "שחרית", day: "ראש חודש וצומות", time: "6:40" },
-  ]);
-
+  // --- State ---
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null);
-  const [formData, setFormData] = useState({
+  const [currentPrayer, setCurrentPrayer] = useState<PrayerTime | null>(null); // Still need this to track which item is being edited
+  const [formData, setFormData] = useState<PrayerTimeData>({ // Use PrayerTimeData for form
     location: "בית הכנסת החדש",
     type: "שחרית",
     day: "רגיל",
@@ -37,64 +34,97 @@ const PrayerTimesManager = () => {
   });
 
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // --- React Query ---
+
+  // Query to fetch prayer times
+  const { data: prayerTimes, isLoading: isLoadingPrayerTimes, isError: isErrorPrayerTimes } = useQuery<PrayerTime[], Error>({
+    queryKey: ['prayerTimes', 'admin'],
+    queryFn: getPrayerTimes,
+    // Initial data can be removed if you don't want placeholders
+    // initialData: [] // Start with empty or provide initial placeholders if desired
+  });
+
+  // Mutation for adding a prayer time
+  const addMutation = useMutation<PrayerTime, Error, PrayerTimeData>({ // Expects PrayerTimeData, returns PrayerTime
+    mutationFn: addPrayerTime,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prayerTimes', 'admin'] }); // Refetch data on success
+      setIsAddDialogOpen(false);
+      toast({ title: "נוסף בהצלחה", description: "זמן התפילה נוסף בהצלחה" });
+      // Reset form
+      setFormData({ location: "בית הכנסת החדש", type: "שחרית", day: "רגיל", time: "" });
+    },
+    onError: (error) => {
+      console.error("Error adding prayer:", error);
+      toast({ title: "שגיאה", description: "אירעה שגיאה בעת הוספת זמן התפילה", variant: "destructive" });
+    },
+  });
+
+  // Mutation for editing a prayer time
+  const editMutation = useMutation<void, Error, { id: string; data: Partial<PrayerTimeData> }>({
+    mutationFn: ({ id, data }) => updatePrayerTime(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prayerTimes', 'admin'] });
+      setIsEditDialogOpen(false);
+      setCurrentPrayer(null);
+      toast({ title: "עודכן בהצלחה", description: "זמן התפילה עודכן בהצלחה" });
+    },
+    onError: (error) => {
+      console.error("Error editing prayer:", error);
+      toast({ title: "שגיאה", description: "אירעה שגיאה בעת עדכון זמן התפילה", variant: "destructive" });
+    },
+  });
+
+  // Mutation for deleting a prayer time
+  const deleteMutation = useMutation<void, Error, string>({ // Expects the ID string
+    mutationFn: deletePrayerTime,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prayerTimes', 'admin'] });
+      toast({ title: "נמחק בהצלחה", description: "זמן התפילה נמחק בהצלחה" });
+    },
+    onError: (error) => {
+      console.error("Error deleting prayer:", error);
+      toast({ title: "שגיאה", description: "אירעה שגיאה בעת מחיקת זמן התפילה", variant: "destructive" });
+    },
+  });
+
+  // --- Event Handlers ---
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value });
+  const handleSelectChange = (name: keyof PrayerTimeData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddPrayer = () => {
-    const newPrayer = {
-      id: Date.now().toString(),
-      ...formData,
-    };
-
-    setPrayerTimes([...prayerTimes, newPrayer]);
-    setIsAddDialogOpen(false);
-    toast({
-      title: "נוסף בהצלחה",
-      description: "זמן התפילה נוסף בהצלחה",
-    });
-
-    // Reset form data
-    setFormData({
-      location: "בית הכנסת החדש",
-      type: "שחרית",
-      day: "רגיל",
-      time: "",
-    });
+  const handleAddPrayerSubmit = () => {
+    addMutation.mutate(formData); // Call the mutation
   };
 
-  const handleEditPrayer = () => {
+  const handleEditPrayerSubmit = () => {
     if (!currentPrayer) return;
-    
-    const updatedPrayerTimes = prayerTimes.map((prayer) => 
-      prayer.id === currentPrayer.id ? { ...prayer, ...formData } : prayer
-    );
-    
-    setPrayerTimes(updatedPrayerTimes);
-    setIsEditDialogOpen(false);
-    setCurrentPrayer(null);
-    toast({
-      title: "עודכן בהצלחה",
-      description: "זמן התפילה עודכן בהצלחה",
-    });
+    // Pass only the fields present in PrayerTimeData
+    const updatedData: PrayerTimeData = {
+        location: formData.location,
+        type: formData.type,
+        day: formData.day,
+        time: formData.time
+    }
+    editMutation.mutate({ id: currentPrayer.id, data: updatedData }); // Call the mutation
   };
 
-  const handleDeletePrayer = (id: string) => {
-    setPrayerTimes(prayerTimes.filter((prayer) => prayer.id !== id));
-    toast({
-      title: "נמחק בהצלחה",
-      description: "זמן התפילה נמחק בהצלחה",
-    });
+  const handleDeletePrayerClick = (id: string) => {
+    // Optional: Add a confirmation dialog here
+    deleteMutation.mutate(id); // Call the mutation
   };
 
   const openEditDialog = (prayer: PrayerTime) => {
     setCurrentPrayer(prayer);
+    // Set form data based on the selected prayer
     setFormData({
       location: prayer.location,
       type: prayer.type,
@@ -104,17 +134,44 @@ const PrayerTimesManager = () => {
     setIsEditDialogOpen(true);
   };
 
+  const closeAddDialog = () => {
+      setIsAddDialogOpen(false);
+      // Reset form only when closing explicitly or on success
+      setFormData({ location: "בית הכנסת החדש", type: "שחרית", day: "רגיל", time: "" });
+  }
+
+  const closeEditDialog = () => {
+      setIsEditDialogOpen(false);
+      setCurrentPrayer(null);
+  }
+
+
+  // --- Render Logic ---
+
+  if (isLoadingPrayerTimes) {
+    return <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin" /> טוען זמני תפילות...</div>;
+  }
+
+  if (isErrorPrayerTimes) {
+    return <div className="text-red-600 text-center p-8">שגיאה בטעינת זמני התפילות. בדוק את החיבור או נסה שוב מאוחר יותר.</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">ניהול זמני תפילות</h2>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="ml-2 h-4 w-4" /> הוסף זמן תפילה
+        <Button onClick={() => setIsAddDialogOpen(true)} disabled={addMutation.isPending}>
+          {addMutation.isPending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Plus className="ml-2 h-4 w-4" />}
+           הוסף זמן תפילה
         </Button>
       </div>
 
+      {prayerTimes && prayerTimes.length === 0 && !isLoadingPrayerTimes && (
+        <p className="text-center text-muted-foreground">לא נמצאו זמני תפילות. הוסף זמן תפילה חדש.</p>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2">
-        {prayerTimes.map((prayer) => (
+        {prayerTimes?.map((prayer) => (
           <Card key={prayer.id} className="overflow-hidden">
             <CardHeader className="bg-primary-dark text-accent p-3">
               <CardTitle className="text-lg flex justify-between items-center">
@@ -124,6 +181,7 @@ const PrayerTimesManager = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => openEditDialog(prayer)}
+                    disabled={editMutation.isPending || deleteMutation.isPending}
                     className="h-8 w-8 p-0"
                   >
                     <Edit className="h-4 w-4" />
@@ -131,10 +189,11 @@ const PrayerTimesManager = () => {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => handleDeletePrayer(prayer.id)}
+                    onClick={() => handleDeletePrayerClick(prayer.id)}
+                    disabled={deleteMutation.isPending || editMutation.isPending || deleteMutation.variables === prayer.id} // Disable if this specific item is being deleted
                     className="h-8 w-8 p-0"
                   >
-                    <Trash className="h-4 w-4" />
+                    {deleteMutation.isPending && deleteMutation.variables === prayer.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <Trash className="h-4 w-4" />}
                   </Button>
                 </div>
               </CardTitle>
@@ -162,11 +221,13 @@ const PrayerTimesManager = () => {
             <DialogTitle>הוספת זמן תפילה חדש</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
+            {/* Form fields remain the same - using formData state */}
+             <div className="space-y-2">
               <label>מיקום</label>
               <Select
-                defaultValue={formData.location}
+                value={formData.location} // Controlled component
                 onValueChange={(value) => handleSelectChange("location", value)}
+                disabled={addMutation.isPending}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר מיקום" />
@@ -177,12 +238,13 @@ const PrayerTimesManager = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label>סוג תפילה</label>
               <Select
-                defaultValue={formData.type}
+                value={formData.type} // Controlled component
                 onValueChange={(value) => handleSelectChange("type", value)}
+                 disabled={addMutation.isPending}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר סוג תפילה" />
@@ -194,7 +256,7 @@ const PrayerTimesManager = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label>יום</label>
               <Input
@@ -202,9 +264,10 @@ const PrayerTimesManager = () => {
                 value={formData.day}
                 onChange={handleInputChange}
                 placeholder="לדוגמה: רגיל, ימים א'-ה', שבת"
+                 disabled={addMutation.isPending}
               />
             </div>
-            
+
             <div className="space-y-2">
               <label>שעה</label>
               <Input
@@ -212,19 +275,22 @@ const PrayerTimesManager = () => {
                 value={formData.time}
                 onChange={handleInputChange}
                 placeholder="לדוגמה: 18:00 או תיאור כגון 'שעה לפני שקיעה'"
+                 disabled={addMutation.isPending}
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsAddDialogOpen(false)}
+              onClick={closeAddDialog} // Use dedicated close handler
+              disabled={addMutation.isPending}
             >
               <X className="ml-2 h-4 w-4" /> ביטול
             </Button>
-            <Button onClick={handleAddPrayer}>
-              <Check className="ml-2 h-4 w-4" /> הוסף
+            <Button onClick={handleAddPrayerSubmit} disabled={addMutation.isPending}>
+              {addMutation.isPending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Check className="ml-2 h-4 w-4" />}
+               הוסף
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -237,11 +303,13 @@ const PrayerTimesManager = () => {
             <DialogTitle>עריכת זמן תפילה</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
+            {/* Form fields remain the same - using formData state */}
+             <div className="space-y-2">
               <label>מיקום</label>
               <Select
-                value={formData.location}
+                value={formData.location} // Use value for controlled component
                 onValueChange={(value) => handleSelectChange("location", value)}
+                disabled={editMutation.isPending}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר מיקום" />
@@ -252,12 +320,13 @@ const PrayerTimesManager = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label>סוג תפילה</label>
               <Select
-                value={formData.type}
+                value={formData.type} // Use value for controlled component
                 onValueChange={(value) => handleSelectChange("type", value)}
+                disabled={editMutation.isPending}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר סוג תפילה" />
@@ -269,7 +338,7 @@ const PrayerTimesManager = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label>יום</label>
               <Input
@@ -277,9 +346,10 @@ const PrayerTimesManager = () => {
                 value={formData.day}
                 onChange={handleInputChange}
                 placeholder="לדוגמה: רגיל, ימים א'-ה', שבת"
+                disabled={editMutation.isPending}
               />
             </div>
-            
+
             <div className="space-y-2">
               <label>שעה</label>
               <Input
@@ -287,19 +357,22 @@ const PrayerTimesManager = () => {
                 value={formData.time}
                 onChange={handleInputChange}
                 placeholder="לדוגמה: 18:00 או תיאור כגון 'שעה לפני שקיעה'"
+                disabled={editMutation.isPending}
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
+              onClick={closeEditDialog} // Use dedicated close handler
+              disabled={editMutation.isPending}
             >
               <X className="ml-2 h-4 w-4" /> ביטול
             </Button>
-            <Button onClick={handleEditPrayer}>
-              <Check className="ml-2 h-4 w-4" /> שמור שינויים
+            <Button onClick={handleEditPrayerSubmit} disabled={editMutation.isPending}>
+               {editMutation.isPending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Check className="ml-2 h-4 w-4" />}
+               שמור שינויים
             </Button>
           </DialogFooter>
         </DialogContent>
