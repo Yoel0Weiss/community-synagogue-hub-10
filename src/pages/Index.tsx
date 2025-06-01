@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { 
   Calendar, 
   Clock, 
@@ -16,12 +16,31 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
+// Import the function to fetch prayer times
+import { getPrayerTimes, PrayerTime as RawPrayerTime } from "@/lib/prayerTimeApi"; // Import with alias
+
+// Define a type for the grouped prayer time data structure needed for rendering
+interface GroupedPrayerTime {
+  id: string; // Can use location name or generate an ID
+  location: string;
+  shacharit: string[];
+  mincha: string[];
+  arvit: string[];
+  // Add other relevant fields if needed, like a general description for the location
+}
+
+
 const Index = () => {
   // State for UI elements
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("prayers");
+  // State to hold prayer times fetched from Firebase (raw data)
+  const [rawPrayerTimes, setRawPrayerTimes] = useState<RawPrayerTime[]>([]);
+  const [loadingPrayerTimes, setLoadingPrayerTimes] = useState(true); // Loading state
+  const [errorFetchingPrayerTimes, setErrorFetchingPrayerTimes] = useState<string | null>(null); // Error state
 
-  // Menu items for navigation (removed contact)
+
+  // Menu items for navigation
   const menuItems = [
     { name: "זמני תפילות", icon: Clock, href: "#prayers" },
     { name: "שיעורים", icon: BookOpen, href: "#classes" },
@@ -29,7 +48,7 @@ const Index = () => {
     { name: "תרומות", icon: Heart, href: "#donate" },
   ];
 
-  // Fix for scroll animation - using simpler approach without opacity change
+  // Fix for scroll animation
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -39,7 +58,7 @@ const Index = () => {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -100px 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -100px 0px" } // Adjust rootMargin as needed
     );
 
     const elements = document.querySelectorAll(".animate-on-scroll");
@@ -54,13 +73,14 @@ const Index = () => {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ["prayers", "classes", "events", "donate"];
-      
+
       // Find which section is currently in view
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top <= 200 && rect.bottom >= 200) {
+          // Check if the section is within the viewport, with some offset
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
             setActiveSection(section);
             break;
           }
@@ -72,6 +92,78 @@ const Index = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // --- useEffect to fetch raw prayer times from Firebase ---
+  useEffect(() => {
+    const fetchPrayerData = async () => {
+      try {
+        setLoadingPrayerTimes(true);
+        const data = await getPrayerTimes();
+        setRawPrayerTimes(data);
+        setErrorFetchingPrayerTimes(null);
+      } catch (error) {
+        console.error("Error fetching prayer times:", error);
+        setErrorFetchingPrayerTimes("Failed to load prayer times.");
+        setRawPrayerTimes([]);
+      } finally {
+        setLoadingPrayerTimes(false);
+      }
+    };
+
+    fetchPrayerData();
+  }, []); // Empty dependency array means this runs once on mount
+  // --- End of fetch useEffect ---
+
+  // --- Memoized computation to group prayer times ---
+  const groupedPrayerTimes = useMemo(() => {
+    const grouped: { [key: string]: { location: string; shacharit: string[]; mincha: string[]; arvit: string[]; id: string } } = {};
+
+    rawPrayerTimes.forEach(prayer => {
+      // Ensure prayer and its properties are not null or undefined
+      if (!prayer || !prayer.location || !prayer.type || !prayer.time) {
+          console.warn("Skipping invalid prayer time entry:", prayer);
+          return; // Skip this entry if essential data is missing
+      }
+
+      if (!grouped[prayer.location]) {
+        // Use a simple slug or ID based on location name for a stable key
+        const id = prayer.location.replace(/\s+/g, '-').toLowerCase();
+        grouped[prayer.location] = {
+          id: id,
+          location: prayer.location,
+          shacharit: [],
+          mincha: [],
+          arvit: [],
+        };
+      }
+
+      // Add the time to the correct prayer type array, including the day info
+      // Ensure day is treated as a string, defaulting to empty if null/undefined
+      const dayInfo = (prayer.day ?? "").trim();
+      const timeEntry = `${prayer.time}${dayInfo && dayInfo !== 'רגיל' ? ` (${dayInfo})` : ''}`.trim();
+
+      if (prayer.type === 'שחרית' && timeEntry) {
+        grouped[prayer.location].shacharit.push(timeEntry);
+      } else if (prayer.type === 'מנחה' && timeEntry) {
+        grouped[prayer.location].mincha.push(timeEntry);
+      } else if (prayer.type === 'ערבית' && timeEntry) {
+        grouped[prayer.location].arvit.push(timeEntry);
+      }
+    });
+
+    // Sort times within each category if needed (optional)
+    Object.values(grouped).forEach(locationData => {
+        locationData.shacharit.sort();
+        locationData.mincha.sort();
+        locationData.arvit.sort();
+    });
+
+    // Return as an array
+    return Object.values(grouped);
+
+  }, [rawPrayerTimes]); // Recompute when rawPrayerTimes changes
+  // --- End of memoized grouping ---
+
+
   return (
     <div className="min-h-screen bg-accent">
       {/* Navigation */}
@@ -82,15 +174,15 @@ const Index = () => {
               <h1 className="text-2xl md:text-3xl font-bold">בית הכנסת</h1>
             </div>
 
-            {/* Desktop Menu - removed search bar */}
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-1 flex-row-reverse">
               {menuItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
                   className={`flex items-center gap-2 text-accent px-4 py-2 rounded-md transition-colors duration-200 hover:bg-primary-light ${
-                    activeSection === item.href.replace("#", "") 
-                      ? "bg-primary-light" 
+                    activeSection === item.href.replace("#", "")
+                      ? "bg-primary-light"
                       : ""
                   }`}
                   onClick={() => setActiveSection(item.href.replace("#", ""))}
@@ -115,7 +207,7 @@ const Index = () => {
             </button>
           </div>
 
-          {/* Mobile Menu - removed search functionality */}
+          {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden absolute top-20 left-0 w-full bg-primary shadow-lg animate-slide-in">
               <div className="px-4 py-4 space-y-4">
@@ -123,9 +215,9 @@ const Index = () => {
                   <a
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-2 py-3 px-4 text-accent hover:bg-primary-light rounded-md transition-colors duration-200 ${
-                      activeSection === item.href.replace("#", "") 
-                        ? "bg-primary-light" 
+                    className={`flex items-center gap-2 py-3 px-4 text-accent hover:bg-primary-light rounded-md transition-colors duration-200 ${'
+                      activeSection === item.href.replace("#", "")
+                        ? "bg-primary-light"
                         : ""
                     }`}
                     onClick={() => {
@@ -175,135 +267,91 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* בית הכנסת החדש */}
-            <Card className="animate-on-scroll shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-primary">
-              <CardHeader className="bg-gradient-to-r from-primary to-primary-light text-accent">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  <CardTitle className="text-2xl">בית הכנסת החדש</CardTitle>
-                </div>
-                <CardDescription className="text-accent-light">זמני תפילה עדכניים</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <Tabs defaultValue="shacharit" className="w-full">
-                  <TabsList className="w-full grid grid-cols-3 mb-4">
-                    <TabsTrigger value="shacharit">שחרית</TabsTrigger>
-                    <TabsTrigger value="mincha">מנחה</TabsTrigger>
-                    <TabsTrigger value="arvit">ערבית</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="shacharit" className="space-y-4">
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <p className="text-text-light text-center">כרגע אין מניין קבוע</p>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="mincha" className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-accent-light rounded-lg mb-2">
-                      <span className="font-medium">13:30</span>
-                      <span className="text-text-light">(רגיל)</span>
-                    </div>
-                    <div className="flex justify-between items-center p-4 bg-accent-light rounded-lg">
-                      <span className="font-medium">15:45</span>
-                      <span className="text-text-light">(רגיל)</span>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="arvit" className="space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-accent-light rounded-lg">
-                      <span className="font-medium">18:00</span>
-                      <span className="text-text-light"></span>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+          {/* --- Conditional rendering based on loading/error state --- */}
+          {loadingPrayerTimes && (
+            <div className="text-center text-text-light">טוען זמני תפילות...</div>
+          )}
 
-            {/* מקומות אחרים */}
-            <Card className="animate-on-scroll shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 border-t-secondary">
-              <CardHeader className="bg-gradient-to-r from-secondary to-secondary-light text-accent">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  <CardTitle className="text-2xl">מקומות אחרים</CardTitle>
-                </div>
-                <CardDescription className="text-accent-light">תפילות במיקומים נוספים</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <Tabs defaultValue="shacharit" className="w-full">
-                  <TabsList className="w-full grid grid-cols-3 mb-4">
-                    <TabsTrigger value="shacharit">שחרית</TabsTrigger>
-                    <TabsTrigger value="mincha">מנחה</TabsTrigger>
-                    <TabsTrigger value="arvit">ערבית</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="shacharit" className="space-y-4">
-                    <div className="p-4 bg-accent-light rounded-lg mb-2">
-                      <div className="flex justify-between">
-                        <span className="font-medium">ימים ב׳-ה׳: 6:50</span>
-                        <span className="text-text-light">בית הכנסת תלפיות</span>
-                      </div>
+          {errorFetchingPrayerTimes && (
+            <div className="text-center text-red-500">{errorFetchingPrayerTimes}</div>
+          )}
+
+          {!loadingPrayerTimes && !errorFetchingPrayerTimes && groupedPrayerTimes.length === 0 && (
+             <div className="text-center text-text-light">אין זמני תפילות זמינים כרגע.</div>
+          )}
+
+          {/* --- Render grouped prayer times if loaded --- */}
+          {!loadingPrayerTimes && groupedPrayerTimes.length > 0 && (
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Map over the grouped prayer times */}
+              {groupedPrayerTimes.map((locationData) => (
+                <Card key={locationData.id} className={`animate-on-scroll shadow-raised hover:shadow-lg transition-shadow duration-300 overflow-hidden border-t-4 ${locationData.location === 'בית הכנסת החדש' ? 'border-t-primary' : 'border-t-secondary'}`}> {/* Adjust border color based on location */}
+                  <CardHeader className={`bg-gradient-to-r ${locationData.location === 'בית הכנסת החדש' ? 'from-primary to-primary-light' : 'from-secondary to-secondary-light'} text-accent`}>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-5 h-5" />
+                      <CardTitle className="text-2xl">{locationData.location}</CardTitle>
                     </div>
-                    <div className="p-4 bg-accent-light rounded-lg mb-2">
-                      <div className="flex justify-between">
-                        <span className="font-medium">ראש חודש וצומות: 6:40</span>
-                        <span className="text-text-light"></span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">ימים א׳, ו׳: 7:30</span>
-                        <span className="text-text-light">אם מתקיים מניין</span>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="mincha" className="space-y-3 max-h-60 overflow-y-auto pr-2">
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">13:15</span>
-                        <span className="text-text-light">בית הכנסת תלפיות</span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">13:20</span>
-                        <span className="text-text-light">בנין קהאלי</span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">13:30</span>
-                        <span className="text-text-light">מעונות ליברמן 4 קומה 1</span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">13:50</span>
-                        <span className="text-text-light">חדר תפילה ליד האקווריום (קצר)</span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">14:15</span>
-                        <span className="text-text-light">במשק</span>
-                      </div>
-                    </div>
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">15:00</span>
-                        <span className="text-text-light">אקדמיה ללשון העברית (קצר)</span>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="arvit" className="space-y-4">
-                    <div className="p-4 bg-accent-light rounded-lg">
-                      <div className="flex justify-between">
-                        <span className="font-medium">20:00</span>
-                        <span className="text-text-light">מול האקווריום - לפי רישום</span>
-                      </div>
-                      <p className="text-text-muted text-sm mt-2">20:15 כשמתאחר צאה״ב</p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
+                    {/* You might add a description field to your data */}
+                    {/* <CardDescription className="text-accent-light">זמני תפילה עדכניים</CardDescription> */}
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <Tabs defaultValue="shacharit" className="w-full">
+                      <TabsList className="w-full grid grid-cols-3 mb-4">
+                        <TabsTrigger value="shacharit">שחרית</TabsTrigger>
+                        <TabsTrigger value="mincha">מנחה</TabsTrigger>
+                        <TabsTrigger value="arvit">ערבית</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="shacharit" className="space-y-4">
+                         {/* Map over Shacharit times from grouped data */}
+                        {locationData.shacharit && locationData.shacharit.length > 0 ? (
+                           locationData.shacharit.map((time, index) => (
+                             <div key={index} className="flex justify-between items-center p-4 bg-accent-light rounded-lg">
+                               <span className="font-medium">{time}</span>
+                               {/* The day info is already included in the time string during grouping */}
+                             </div>
+                           ))
+                        ) : (
+                           <div className="p-4 bg-accent-light rounded-lg">
+                             <p className="text-text-light text-center">אין מניין קבוע</p>
+                           </div>
+                        )}
+                      </TabsContent>
+                      <TabsContent value="mincha" className="space-y-4">
+                         {/* Map over Mincha times from grouped data */}
+                         {locationData.mincha && locationData.mincha.length > 0 ? (
+                            locationData.mincha.map((time, index) => (
+                              <div key={index} className="flex justify-between items-center p-4 bg-accent-light rounded-lg">
+                                <span className="font-medium">{time}</span>
+                              </div>
+                            ))
+                         ) : (
+                            <div className="p-4 bg-accent-light rounded-lg">
+                              <p className="text-text-light text-center">אין מניין קבוע</p>
+                            </div>
+                         )}
+                      </TabsContent>
+                      <TabsContent value="arvit" className="space-y-4">
+                         {/* Map over Arvit times from grouped data */}
+                         {locationData.arvit && locationData.arvit.length > 0 ? (
+                            locationData.arvit.map((time, index) => (
+                              <div key={index} className="flex justify-between items-center p-4 bg-accent-light rounded-lg">
+                                <span className="font-medium">{time}</span>
+                              </div>
+                            ))
+                         ) : (
+                            <div className="p-4 bg-accent-light rounded-lg">
+                              <p className="text-text-light text-center">אין מניין קבוע</p>
+                            </div>
+                         )}
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+           {/* --- End of Conditional rendering --- */}
+
         </div>
       </section>
 
@@ -384,7 +432,7 @@ const Index = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-bold text-text mb-4 flex items-center">
@@ -398,7 +446,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-center mt-8 p-4 bg-secondary/10 rounded-lg">
                 <p className="text-text-light font-medium">
                   תרומתכם תסייע בהחזקת בית הכנסת ופעילויותיו. תזכו למצוות!
@@ -418,7 +466,7 @@ const Index = () => {
               <p className="mb-4 text-accent-light">מקום של תפילה, לימוד וקהילה</p>
               <p className="text-accent-light">© {new Date().getFullYear()} כל הזכויות שמורות</p>
             </div>
-            
+
             <div>
               <h3 className="text-xl font-bold mb-4">ניווט מהיר</h3>
               <ul className="space-y-2">
@@ -433,9 +481,9 @@ const Index = () => {
               </ul>
             </div>
           </div>
-          
+
           <Separator className="bg-primary-light opacity-30 my-8" />
-          
+
           <div className="text-center text-accent-light text-sm">
             <p>בית הכנסת - רחוב האוניברסיטה 1, ירושלים</p>
           </div>

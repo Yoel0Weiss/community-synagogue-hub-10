@@ -124,12 +124,12 @@ const PrayerTimesManager = () => {
 
   const openEditDialog = (prayer: PrayerTime) => {
     setCurrentPrayer(prayer);
-    // Set form data based on the selected prayer
+    // Set form data based on the selected prayer, defaulting undefined to empty string
     setFormData({
-      location: prayer.location,
-      type: prayer.type,
-      day: prayer.day,
-      time: prayer.time,
+      location: prayer.location ?? "",
+      type: prayer.type ?? "",
+      day: prayer.day ?? "",
+      time: prayer.time ?? "",
     });
     setIsEditDialogOpen(true);
   };
