@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,49 +7,45 @@
 
 :root {
   direction: rtl;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Heebo', sans-serif;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: theme('colors.background.DEFAULT');
-  color: theme('colors.text.DEFAULT');
+  @apply text-text bg-accent;
+  scroll-behavior: smooth;
 }
 
-/* שיפור נגישות */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Typography improvements */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading font-bold;
+  line-height: 1.2;
 }
 
-/* קונטרסט משופר עבור טקסט */
-.text-contrast {
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-}
-
-/* התאמות נגישות למסכי מגע */
-@media (hover: none) {
-  .hover\:scale-105 {
-    transform: none !important;
-  }
-}
-
-/* שיפור קריאות */
-.readable-text {
-  max-width: 65ch;
+p {
   line-height: 1.6;
 }
 
-/* אנימציות */
+/* Better focus states for accessibility */
+:focus-visible {
+  outline: 2px solid #008080;
+  outline-offset: 2px;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Animation on scroll - FIXED to prevent disappearing content */
 .animate-on-scroll {
-  opacity: 0;
+  opacity: 0.1; /* Start with slight visibility instead of completely hidden */
   transform: translateY(20px);
-  transition: all 0.6s ease-out;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
 .animate-on-scroll.visible {
@@ -57,18 +53,58 @@ body {
   transform: translateY(0);
 }
 
-/* שיפור מיקוד עבור נגישות */
-*:focus-visible {
-  outline: 3px solid theme('colors.secondary.DEFAULT');
-  outline-offset: 2px;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-/* שיפור גודל נקודות לחיצה במובייל */
-@media (max-width: 768px) {
-  button, 
-  a {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 0.5rem;
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #bdbdbd;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a1a1a1;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Prevent content jump on page load */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f1f1f1;
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+/* High contrast mode improvements */
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: #006666;
+    --text-color: #000;
+    --background-color: #fff;
+  }
+}
+
+/* Reduce motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
